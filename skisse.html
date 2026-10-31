@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Min Forsikring – skisse</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--sky:#8fb3c4;--sun:#ffd57a;--cream:#f6f1e4;--ink:#163f35;--card:#fff;--muted:#6b7b76;--green:#3fae5a;--orange:#f0962e;--red:#d9534f;--coral:#e9806b;--mint:#6fcfa8;--pink:#f3a1b5}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Nunito,system-ui,sans-serif;background:linear-gradient(180deg,var(--sky) 0%,#b9cfd6 55%,var(--cream) 100%);min-height:100vh;color:var(--ink);padding-bottom:96px}
+header{background:var(--sun);border-radius:0 0 32px 32px;padding:48px 20px 22px}
+header h1{font-size:15px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;opacity:.75}
+.total{margin-top:6px;font-size:13px;font-weight:700}
+.total b{display:block;font-size:34px;font-weight:800;letter-spacing:-.01em}
+.next{margin-top:10px;font-size:13px;background:rgba(255,255,255,.55);display:inline-block;padding:6px 12px;border-radius:99px;font-weight:700}
+main{padding:20px 16px;display:flex;flex-direction:column;gap:14px;max-width:520px;margin:0 auto}
+.card{background:var(--card);border-radius:20px;box-shadow:0 6px 18px rgba(22,63,53,.12);overflow:hidden;cursor:pointer;transition:transform .15s}
+.card:active{transform:scale(.98)}
+.head{display:flex;align-items:center;gap:14px;padding:14px}
+.icon{width:56px;height:56px;border-radius:16px;background:var(--ink);display:grid;place-items:center;flex:none}
+.icon svg{width:30px;height:30px}
+.meta{flex:1;min-width:0}
+.meta .t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:800;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.meta .s{font-size:15px;font-weight:700;margin-top:2px}
+.meta .p{font-size:16px;color:var(--muted);font-weight:700;margin-top:4px}
+.chev{width:28px;height:28px;border-radius:50%;background:var(--cream);display:grid;place-items:center;transition:transform .25s;font-weight:800}
+.card.open .chev{transform:rotate(180deg)}
+.bar{height:5px;background:#ece6d6;margin:0 14px 12px;border-radius:9px}
+.bar i{display:block;height:100%;border-radius:9px;background:var(--green)}
+.due{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin:0 14px 4px;font-weight:700}
+.body{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.card.open .body{max-height:600px}
+.rows{border-top:1px solid #eee7d6;margin:0 14px;padding:10px 0}
+.row{display:flex;justify-content:space-between;padding:7px 0;font-size:14px;border-bottom:1px dashed #eee7d6}
+.row:last-child{border:0}
+.row span{color:var(--muted)}
+.row b{font-weight:800;text-align:right}
+.actions{display:flex;gap:8px;padding:4px 14px 16px;flex-wrap:wrap}
+.btn{flex:1;min-width:120px;border:0;border-radius:12px;padding:11px;font:800 13px Nunito,sans-serif;background:var(--cream);color:var(--ink)}
+.btn.dark{background:var(--ink);color:#fff}
+nav{position:fixed;bottom:0;left:0;right:0;background:#fff;display:flex;padding:10px 16px calc(10px + env(safe-area-inset-bottom));gap:10px;box-shadow:0 -4px 16px rgba(0,0,0,.08)}
+nav a{flex:1;text-decoration:none;color:var(--ink);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:14px}
+nav a.r{background:#ffd1c2;color:#7a2e17} nav a.k{background:#bff0c9;color:#11552a}
+.badge{background:var(--red);color:#fff;border-radius:99px;font-size:11px;padding:1px 7px}
+.note{font-size:11px;text-align:center;color:var(--muted);margin-top:4px}
+.view{display:none}.view.on{display:block}
+.back{background:none;border:0;font:800 14px Nunito,sans-serif;color:var(--ink);opacity:.75;margin-bottom:6px;cursor:pointer}
+header h2{font-size:30px;font-weight:800}
+header .sub{font-size:14px;font-weight:700;opacity:.8;margin-top:2px}
+nav a.on{outline:2px solid currentColor}
+.icon.e{font-size:28px}
+.list{padding:4px 0}
+.li{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px dashed #eee7d6;font-size:14px}
+.li:last-child{border:0}
+.li span{color:var(--muted);font-weight:700}
+.pill{font-size:12px;font-weight:800;padding:3px 9px;border-radius:99px;background:#e3f4e7;color:#1d6b33;white-space:nowrap}
+.pill.w{background:#fde7cf;color:#9a520b}
+.chips{display:flex;gap:6px;flex-wrap:wrap;padding:6px 0 4px}
+.chip{border:1.5px solid #e2dccb;background:#fff;border-radius:99px;padding:6px 12px;font:800 13px Nunito,sans-serif;color:var(--ink)}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.lbl{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:10px}
+input[type=checkbox]{width:20px;height:20px;accent-color:var(--ink)}
+.meter{height:10px;border-radius:9px;background:#ece6d6;margin:8px 0 4px;overflow:hidden}.meter i{display:block;height:100%;background:var(--orange)}
+.small{font-size:12px;color:var(--muted);font-weight:700}
+.panel{background:#fff;border-radius:20px;box-shadow:0 6px 18px rgba(22,63,53,.12);padding:16px}
+.panel h3{font-size:16px;font-weight:800;margin-bottom:4px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.topic{border:0;border-radius:14px;padding:14px 10px;font:800 14px Nunito,sans-serif;background:#e6f6ea;color:#11552a;text-align:left}
+.topic small{display:block;font-weight:700;font-size:11px;color:#3d7a52;margin-top:2px}
+.topic.on{background:#11552a;color:#fff}.topic.on small{color:#cdeed6}
+textarea{width:100%;min-height:84px;border:1.5px solid #e2dccb;border-radius:14px;padding:12px;font:600 15px Nunito,sans-serif;color:var(--ink);margin-top:10px;resize:vertical}
+.prompt{background:var(--cream);border-radius:14px;padding:12px;font-size:12.5px;line-height:1.45;white-space:pre-wrap;margin-top:10px;max-height:190px;overflow:auto;font-family:ui-monospace,Menlo,monospace;color:#30443e}
+.hide{display:none}
+</style>
+</head>
+<body>
+<!-- FORSIDE -->
+<section id="home" class="view on">
+<header>
+  <h1>Min Forsikring</h1>
+  <div class="total">Total årspremie<b>24 870 kr</b></div>
+</header>
+<main id="list"></main>
+<p class="note">Skisse med eksempeldata – trykk på en boks for å åpne/lukke</p>
+</section>
+
+<!-- PÅMINNELSER -->
+<section id="rem" class="view">
+<header style="background:#ffd1c2">
+  <button class="back" onclick="go('home')">← Oversikt</button>
+  <h2>Påminnelser</h2>
+  <div class="sub">2 ting trenger oppmerksomhet</div>
+</header>
+<main>
+ <div class="card" onclick="this.classList.toggle('open')">
+  <div class="head"><div class="icon e">🔔</div>
+   <div class="meta"><div class="t">Fornyelser</div><div class="p">Bil fornyes om 63 dager</div></div><div class="chev">⌄</div></div>
+  <div class="bar"><i style="width:85%;background:var(--orange)"></i></div>
+  <div class="body"><div class="rows" onclick="event.stopPropagation()">
+   <div class="list">
+    <div class="li">Bilforsikring<span>01.01.2027</span><b class="pill w">63 dager</b></div>
+    <div class="li">Husforsikring<span>15.05.2027</span><b class="pill">197 dager</b></div>
+    <div class="li">Innboforsikring<span>15.05.2027</span><b class="pill">197 dager</b></div>
+    <div class="li">Reiseforsikring<span>01.09.2027</span><b class="pill">306 dager</b></div>
+   </div>
+   <div class="lbl">Varsle meg før forfall</div>
+   <div class="chips"><button class="chip">14 dager</button><button class="chip on">30 dager</button><button class="chip">60 dager</button><button class="chip">90 dager</button></div>
+   <div class="small">Varselet vises her og som merke på knappen nederst. Kan også legges i kalenderen (iPhone/PC).</div>
+  </div><div class="actions"><button class="btn">📅 Legg i kalender</button></div></div>
+ </div>
+
+ <div class="card" onclick="this.classList.toggle('open')">
+  <div class="head"><div class="icon e">⚖️</div>
+   <div class="meta"><div class="t">Årlig tilbud</div><div class="p">Sammenlign før 15. november</div></div><div class="chev">⌄</div></div>
+  <div class="bar"><i style="width:25%"></i></div>
+  <div class="body"><div class="rows" onclick="event.stopPropagation()">
+   <div class="small" style="padding-top:4px">Hent tilbud fra andre selskap ca. 6 uker før forfall. Huk av når det er gjort i år.</div>
+   <div class="list">
+    <label class="li">Bilforsikring<input type="checkbox"></label>
+    <label class="li">Husforsikring<input type="checkbox"></label>
+    <label class="li">Innboforsikring<input type="checkbox"></label>
+    <label class="li">Reiseforsikring<input type="checkbox" checked></label>
+   </div>
+  </div><div class="actions"><button class="btn dark">🔗 Åpne bytt.no</button></div></div>
+ </div>
+
+ <div class="card" onclick="this.classList.toggle('open')">
+  <div class="head"><div class="icon e">🛋️</div>
+   <div class="meta"><div class="t">Innboregister</div><div class="p">Sist oppdatert for 7 mnd siden</div></div><div class="chev">⌄</div></div>
+  <div class="bar"><i style="width:60%;background:var(--orange)"></i></div>
+  <div class="body"><div class="rows" onclick="event.stopPropagation()">
+   <div class="list">
+    <div class="li">Stue<span>14 gjenstander</span><b>210 000 kr</b></div>
+    <div class="li">Kjøkken<span>9 gjenstander</span><b>145 000 kr</b></div>
+    <div class="li">Soverom<span>8 gjenstander</span><b>96 000 kr</b></div>
+    <div class="li">Kontor<span>6 gjenstander</span><b>88 000 kr</b></div>
+    <div class="li">Bod/garasje<span>11 gjenstander</span><b>73 000 kr</b></div>
+   </div>
+   <div class="lbl">Registrert verdi mot forsikringssum</div>
+   <div class="meter"><i style="width:41%"></i></div>
+   <div class="small">612 000 kr registrert av 1 500 000 kr forsikringssum</div>
+  </div><div class="actions"><button class="btn dark">＋ Legg til gjenstand</button><button class="btn">📷 Rom for rom</button></div></div>
+ </div>
+ <p class="note">Innboregisteret med bilder og kvitteringer lagres kun på denne enheten.</p>
+</main>
+</section>
+
+<!-- KI-ASSISTENT -->
+<section id="ai" class="view">
+<header style="background:#bff0c9">
+  <button class="back" onclick="go('home')">← Oversikt</button>
+  <h2>KI-assistent</h2>
+  <div class="sub">Spør om dekning, hull og egenandeler</div>
+</header>
+<main>
+ <div class="panel">
+  <h3>Hva lurer du på?</h3>
+  <div class="small">Velg et tema, eller skriv et eget spørsmål.</div>
+  <div class="grid">
+   <button class="topic" onclick="pick(this)">🕳️ Hull<small>Hva er jeg ikke dekket for?</small></button>
+   <button class="topic" onclick="pick(this)">🔁 Dobbeltdekning<small>Betaler jeg to ganger?</small></button>
+   <button class="topic" onclick="pick(this)">💰 Egenandel<small>Lønner det seg å heve den?</small></button>
+   <button class="topic" onclick="pick(this)">🚫 Unntak<small>Viktige begrensninger</small></button>
+  </div>
+  <textarea id="q" placeholder="F.eks. Jeg var i en bilulykke i går. Hva er jeg dekket for?"></textarea>
+  <div class="chips">
+   <button class="chip" onclick="ex(this)">Bilulykke – hva dekkes?</button>
+   <button class="chip" onclick="ex(this)">Mistet mobilen på ferie</button>
+   <button class="chip" onclick="ex(this)">Vannlekkasje på badet</button>
+  </div>
+  <div class="actions" style="padding:10px 0 0"><button class="btn dark" onclick="makePrompt()">✨ Lag spørsmål til Claude</button></div>
+  <div id="out" class="hide">
+   <div class="lbl">Ferdig tekst – med polisedataene dine</div>
+   <div class="prompt" id="pr"></div>
+   <div class="actions" style="padding:10px 0 0"><button class="btn">📋 Kopier</button><button class="btn dark">↗ Åpne Claude</button></div>
+  </div>
+ </div>
+ <p class="note">Versjon 1: Teksten limes inn i Claude. Senere kan svaret komme direkte her.</p>
+</main>
+</section>
+
+<nav>
+  <a href="#" class="r" id="nr" onclick="go('rem');return false">🔔 Påminnelser <span class="badge">2</span></a>
+  <a href="#" class="k" id="nk" onclick="go('ai');return false">✨ KI-assistent</a>
+</nav>
+
+<script>
+const ic={
+ bil:'<svg viewBox="0 0 24 24" fill="#ffd57a"><path d="M5 11l1.6-4.2A2 2 0 0 1 8.5 5.5h7a2 2 0 0 1 1.9 1.3L19 11v7a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-1H8v1a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z"/><circle cx="8" cy="14" r="1.4" fill="#163f35"/><circle cx="16" cy="14" r="1.4" fill="#163f35"/></svg>',
+ hus:'<svg viewBox="0 0 24 24" fill="#e9806b"><path d="M12 3l9 8h-2v9h-5v-6h-4v6H5v-9H3z"/></svg>',
+ innbo:'<svg viewBox="0 0 24 24" fill="#f3a1b5"><path d="M4 11a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4H4zM3 15h18v3h-2v2h-2v-2H7v2H5v-2H3z"/></svg>',
+ reise:'<svg viewBox="0 0 24 24" fill="#6fcfa8"><path d="M21 15.5v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V8.5l-8 5v2l8-2.5V18l-2 1.5V21l3.5-1 3.5 1v-1.5L13 18v-5z"/></svg>'
+};
+const data=[
+ {k:'bil',t:'Bilforsikring',s:'If',p:6950,due:'01.01.2027',pct:85,warn:true,rows:[['Dekning','Fullkasko'],['Bonus','75 %'],['Egenandel','6 000 kr'],['Kjørelengde','16 000 km'],['Polisenr.','123 456 789']]},
+ {k:'hus',t:'Husforsikring',s:'If',p:9800,due:'15.05.2027',pct:45,rows:[['Dekning','Fullverdi'],['Egenandel','8 000 kr'],['Areal','180 m²'],['Polisenr.','123 456 790']]},
+ {k:'innbo',t:'Innboforsikring',s:'If',p:4120,due:'15.05.2027',pct:45,rows:[['Forsikringssum','1 500 000 kr'],['Egenandel','4 000 kr'],['Innboliste','Sist oppdatert mars 2026'],['Polisenr.','123 456 791']]},
+ {k:'reise',t:'Reiseforsikring',s:'If',p:4000,due:'01.09.2027',pct:15,rows:[['Dekning','Familie, helårs'],['Varighet per reise','Inntil 70 dager'],['Område','Hele verden'],['Aldersgrense','Ingen'],['Kortforsikring','Visa via bank'],['Nødnummer','+47 21 49 24 00'],['Polisenr.','123 456 792']]}
+];
+const kr=n=>n.toLocaleString('nb-NO')+' kr';
+document.getElementById('list').innerHTML=data.map(d=>`
+<div class="card" onclick="this.classList.toggle('open')">
+ <div class="head">
+  <div class="icon">${ic[d.k]}</div>
+  <div class="meta"><div class="t">${d.t}</div><div class="p">${kr(d.p)} / år</div></div>
+  <div class="chev">⌄</div>
+ </div>
+ <div class="due"><span>Forfall</span><span>${d.due}</span></div>
+ <div class="bar"><i style="width:${d.pct}%;background:${d.warn?'var(--orange)':'var(--green)'}"></i></div>
+ <div class="body">
+  <div class="rows">${d.rows.map(r=>`<div class="row"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('')}</div>
+  <div class="actions" onclick="event.stopPropagation()">
+   <button class="btn">📄 Polise (PDF)</button>
+   <button class="btn">🔗 Min side</button>
+   <button class="btn dark">✏️ Rediger</button>
+  </div>
+ </div>
+</div>`).join('');
+
+function go(v){document.querySelectorAll('.view').forEach(e=>e.classList.toggle('on',e.id===v));
+ nr.classList.toggle('on',v==='rem');nk.classList.toggle('on',v==='ai');scrollTo(0,0)}
+function pick(b){document.querySelectorAll('.topic').forEach(t=>t.classList.remove('on'));b.classList.add('on')}
+function ex(c){q.value={'Bilulykke – hva dekkes?':'Jeg var i en bilulykke i går. Hva er jeg dekket for?','Mistet mobilen på ferie':'Jeg mistet mobilen på ferie i Spania. Hvilken forsikring dekker dette, og hva blir egenandelen?','Vannlekkasje på badet':'Vi har fått vannlekkasje på badet. Hva dekker hus- og innboforsikringen?'}[c.textContent]}
+function makePrompt(){if(!q.value)q.value='Jeg var i en bilulykke i går. Hva er jeg dekket for?';
+ pr.textContent='Du er en norsk forsikringsrådgiver. Her er våre forsikringer:\n\n'+data.map(d=>'• '+d.t+' ('+d.s+'), '+kr(d.p)+'/år, forfall '+d.due+': '+d.rows.map(r=>r[0]+' '+r[1]).join(', ')).join('\n')+'\n\nSpørsmål: '+q.value+'\n\nSvar kort og konkret, og si hva jeg bør sjekke i vilkårene.';
+ out.classList.remove('hide')}
+</script>
+</body>
+</html>
