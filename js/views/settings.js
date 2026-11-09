@@ -25,11 +25,12 @@ export function render(root, ctx) {
       <div class="stack">
         <button class="btn dark wide" data-action="export">📤 Del med ektefelle / ta sikkerhetskopi</button>
         <label class="file-pick">
-          <input type="file" name="import" accept="application/json,.json" class="visually-hidden">
+          <input type="file" name="import" class="visually-hidden">
           <span class="btn wide" aria-hidden="true">📥 Importer fil</span>
           <span class="visually-hidden">Importer fil fra ektefelle eller sikkerhetskopi</span>
         </label>
       </div>
+      <p class="small" style="margin-top:10px">Mottatt fil via AirDrop, Meldinger eller Mail? Lagre den i Filer først (AirDrop havner i Filer → Nedlastinger). Trykk så «Importer fil» og velg filen <b>min-forsikring-…json</b>.</p>
     </section>
 
     <section class="panel" aria-labelledby="s-warn">
@@ -109,9 +110,22 @@ export function render(root, ctx) {
   });
 
   main.querySelector('input[name="import"]').addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    e.target.value = '';
-    if (file) await importFlow(ctx, file);
+    const input = e.target;
+    const file = input.files[0];
+    if (!file) return;
+    ctx.toast('Leser filen …');
+    // Les innholdet før feltet nullstilles – på iPhone kan filen ellers bli tom.
+    let text;
+    try {
+      text = await file.text();
+    } catch (err) {
+      console.error(err);
+      ctx.toast('Kunne ikke lese filen. Lagre den i Filer først, og prøv igjen.', { error: true, ms: 7000 });
+      return;
+    } finally {
+      input.value = '';
+    }
+    await importFlow(ctx, text);
   });
 }
 
@@ -178,11 +192,11 @@ async function exportFlow(ctx) {
 
 // ---------- Import ----------
 
-async function importFlow(ctx, file) {
+async function importFlow(ctx, text) {
   const { state, actions, toast } = ctx;
   let data;
   try {
-    data = await readImportFile(file);
+    data = readImportFile(text);
   } catch (err) {
     toast(err.message, { error: true, ms: 6000 });
     return;
@@ -235,6 +249,11 @@ async function importFlow(ctx, file) {
   }
   try {
     const r = await actions.importData(data, mode);
+    if (mode === 'merge' && r.policies === 0 && r.items === 0 && r.rooms === 0) {
+      toast('Ingenting ble endret: alt her er likt eller nyere enn i filen. Velg «Erstatt alt» hvis du vil bruke filen.', { ms: 9000 });
+      ctx.rerender();
+      return;
+    }
     toast(mode === 'replace'
       ? `Ferdig. ${r.policies} poliser og ${r.items} gjenstander er importert.`
       : `Ferdig. ${r.policies} poliser og ${r.items} gjenstander er lagt til eller oppdatert.`, { ms: 6000 });

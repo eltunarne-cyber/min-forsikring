@@ -111,12 +111,14 @@ export async function shareOrDownload(file, { preferDownload = false } = {}) {
 }
 
 // Les og kontroller en eksportfil. Kaster Error med norsk melding ved feil.
-export async function readImportFile(file) {
+// Tar imot innholdet i filen som tekst. Filtypen sjekkes ikke, bare innholdet,
+// fordi filer kan få nytt navn eller ny type når de sendes mellom telefoner.
+export function readImportFile(text) {
   let data;
   try {
-    data = JSON.parse(await file.text());
+    data = JSON.parse(String(text).replace(/^\uFEFF/, ''));
   } catch {
-    throw new Error('Filen kunne ikke leses. Velg en fil som er laget med «Del med ektefelle».');
+    throw new Error('Filen kunne ikke leses. Velg filen min-forsikring-…json som er laget med «Del med ektefelle».');
   }
   if (data?.app !== 'min-forsikring' || !Array.isArray(data.policies)) {
     throw new Error('Dette er ikke en fil fra Min Forsikring.');
