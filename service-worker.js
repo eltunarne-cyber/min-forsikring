@@ -2,7 +2,7 @@
 // Cache-first for app-filer. Bytt CACHE-versjonen når appen endres, ellers
 // får brukerne ikke de nye filene.
 
-const CACHE = 'min-forsikring-v1.0.0';
+const CACHE = 'min-forsikring-v1.0.1';
 
 const APP_FILES = [
   './',
@@ -25,6 +25,8 @@ const APP_FILES = [
   './js/views/edit.js',
   './js/views/inventory.js',
   './js/views/settings.js',
+  './js/vendor/pdfjs/pdf.min.js',
+  './js/vendor/pdfjs/pdf.worker.min.js',
   './fonts/nunito-500.woff2',
   './fonts/nunito-700.woff2',
   './fonts/nunito-800.woff2',

@@ -137,12 +137,15 @@ export async function openDocument(ref, getFile, toast) {
 }
 
 // Fullskjermvisning av et dokument inne i appen.
+// PDF-er tegnes side for side med PDF.js, fordi iPhone bare viser første side
+// når en PDF ligger i en innebygd ramme (iframe).
 function showViewer(ref, blob, toast) {
-  const url = URL.createObjectURL(blob);
   const isImg = (blob.type || '').startsWith('image/');
   const ext = isImg ? '.jpg' : '.pdf';
   const name = (ref.fileName || ref.title || 'dokument').replace(/\.[^.]+$/, '') + ext;
   const file = new File([blob], name, { type: blob.type || (isImg ? 'image/jpeg' : 'application/pdf') });
+  const urls = [];
+  let pdfDoc = null;
 
   const dlg = document.createElement('dialog');
   dlg.className = 'viewer';
@@ -153,10 +156,29 @@ function showViewer(ref, blob, toast) {
       <b class="viewer-title">${esc(ref.title || '')}</b>
       <button type="button" class="btn dark" data-v="share">📤 Del / lagre</button>
     </div>
-    <div class="viewer-body">
-      ${isImg ? `<img src="${url}" alt="${esc(ref.title || 'Bilde')}">` : `<iframe src="${url}" title="${esc(ref.title || 'PDF')}"></iframe>`}
+    <div class="viewer-body ${isImg ? '' : 'pdf'}">
+      <p class="viewer-status" role="status" aria-live="polite"></p>
     </div>`;
   document.body.append(dlg);
+  const body = dlg.querySelector('.viewer-body');
+  const statusEl = dlg.querySelector('.viewer-status');
+  const setStatus = (text) => { statusEl.textContent = text; statusEl.hidden = !text; };
+
+  if (isImg) {
+    const url = URL.createObjectURL(blob);
+    urls.push(url);
+    body.insertAdjacentHTML('beforeend', `<img src="${url}" alt="${esc(ref.title || 'Bilde')}">`);
+    setStatus('');
+  } else {
+    setStatus('Åpner dokumentet …');
+    renderPdf(body, blob, setStatus, urls, () => !dlg.open)
+      .then((doc) => { pdfDoc = doc; })
+      .catch((err) => {
+        console.error(err);
+        setStatus('Kunne ikke vise dokumentet her. Trykk «📤 Del / lagre» og velg f.eks. «Lagre i Filer» for å åpne det.');
+      });
+  }
+
   dlg.addEventListener('click', async (e) => {
     const b = e.target.closest('[data-v]');
     if (!b) return;
@@ -167,6 +189,65 @@ function showViewer(ref, blob, toast) {
       toast('Deling støttes ikke her.', { error: true });
     }
   });
-  dlg.addEventListener('close', () => { dlg.remove(); URL.revokeObjectURL(url); });
+  dlg.addEventListener('close', () => {
+    dlg.remove();
+    urls.forEach((u) => URL.revokeObjectURL(u));
+    pdfDoc?.destroy();
+  });
   dlg.showModal();
+}
+
+// PDF.js lastes først når en PDF skal vises (filene er store), og ligger i appen
+// slik at det også virker uten nett.
+const PDFJS_DIR = 'js/vendor/pdfjs/';
+let pdfjsPromise = null;
+function loadPdfJs() {
+  pdfjsPromise ??= new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = PDFJS_DIR + 'pdf.min.js';
+    script.onload = () => {
+      const lib = window.pdfjsLib;
+      if (!lib) { reject(new Error('PDF.js mangler')); return; }
+      lib.GlobalWorkerOptions.workerSrc = PDFJS_DIR + 'pdf.worker.min.js';
+      resolve(lib);
+    };
+    script.onerror = () => reject(new Error('Kunne ikke laste PDF.js'));
+    document.head.append(script);
+  });
+  pdfjsPromise.catch(() => { pdfjsPromise = null; });
+  return pdfjsPromise;
+}
+
+// Tegner alle sidene som bilder under hverandre. Hver side tegnes på et lerret og
+// gjøres om til et bilde, slik at lange dokumenter ikke bruker opp minnet på iPhone.
+async function renderPdf(container, blob, setStatus, urls, cancelled) {
+  const lib = await loadPdfJs();
+  const data = new Uint8Array(await blob.arrayBuffer());
+  const doc = await lib.getDocument({ data, isEvalSupported: false }).promise;
+  const width = Math.max(1, container.clientWidth - 16);
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  for (let n = 1; n <= doc.numPages; n++) {
+    if (cancelled()) break;
+    if (doc.numPages > 1) setStatus(`Laster side ${n} av ${doc.numPages} …`);
+    const page = await doc.getPage(n);
+    const scale = (width / page.getViewport({ scale: 1 }).width) * dpr * 1.5; // litt ekstra skarphet ved zoom
+    const viewport = page.getViewport({ scale });
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.floor(viewport.width);
+    canvas.height = Math.floor(viewport.height);
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    await page.render({ canvasContext: ctx, viewport }).promise;
+    page.cleanup();
+    const img = new Blob([await new Promise((r) => canvas.toBlob(r, 'image/jpeg', 0.85))], { type: 'image/jpeg' });
+    canvas.width = canvas.height = 0; // frigjør minnet til lerretet
+    const url = URL.createObjectURL(img);
+    urls.push(url);
+    container.insertAdjacentHTML('beforeend',
+      `<img class="pdf-page" src="${url}" alt="Side ${n} av ${doc.numPages}">`);
+  }
+  setStatus('');
+  return doc;
 }
