@@ -510,6 +510,8 @@ body.sheet-open .tabbar { visibility: hidden; }
 .check-row input { margin-top: 1px; }
 .diff { margin: 10px 0 0 1.2em; font-size: calc(15 * var(--px)); }
 .diff li { margin: 4px 0; }
+.steps { margin: 8px 0 10px 1.3em; font-size: calc(16 * var(--px)); }
+.steps li { margin: 6px 0; }
 .dialog .dialog-actions .btn { min-width: 0; }
 
 /* ---------- Dokumentvisning (hjemskjerm-app på iPhone) ---------- */

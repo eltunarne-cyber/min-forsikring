@@ -52,6 +52,9 @@ export function render(root, ctx) {
         ctx.toast('Ingen forsikringer har fornyelsesdato ennå. Legg den inn under «Rediger».');
         return;
       }
+      // Appen på hjemskjermen på iPhone kan ikke sende filen rett til Kalender.
+      // Vis hvordan det gjøres via Mail før Del-menyen åpnes.
+      if (window.navigator.standalone === true && !(await calendarHelpDialog())) return;
       const outcome = await downloadIcs(buildIcs(withDate, state.settings.warnDays));
       if (outcome === 'downloaded') ctx.toast('Kalenderfilen er laget. Åpne den for å legge datoene i kalenderen.', { ms: 6000 });
     } else if (action === 'bytt') {
@@ -246,5 +249,35 @@ function inventoryCard(state) {
         : `${esc(formatKr(registered))} registrert. Legg inn forsikringssum på innbopolisen for å sammenligne.`}</p>
       <p class="small">Lagres kun på denne enheten.</p>`,
     actions: '<button class="btn dark" data-action="add-item">＋ Legg til gjenstand</button><button class="btn" data-action="inventory">Åpne innboregister</button>',
+  });
+}
+
+// Forklaring for hjemskjerm-appen på iPhone: kalenderfilen må via Mail (eller Filer).
+function calendarHelpDialog() {
+  return new Promise((resolve) => {
+    const dlg = document.createElement('dialog');
+    dlg.className = 'dialog';
+    dlg.setAttribute('aria-labelledby', 'cal-title');
+    dlg.innerHTML = `
+      <h2 id="cal-title">Legg datoene i Kalender</h2>
+      <p>På iPhone går det via e-post:</p>
+      <ol class="steps">
+        <li>Trykk <b>Fortsett</b> og velg <b>Mail</b>. Send e-posten til deg selv.</li>
+        <li>Åpne e-posten i <b>Mail</b>-appen og trykk på vedlegget <b>forsikring-fornyelser.ics</b>.</li>
+        <li>Trykk <b>Legg til alle</b> og velg kalender.</li>
+      </ol>
+      <p class="small">Alarmen kommer da også når appen er lukket. Gjør dette på nytt når fornyelsesdatoene endres.</p>
+      <div class="dialog-actions">
+        <button type="button" class="btn" value="cancel">Avbryt</button>
+        <button type="button" class="btn dark" value="ok">Fortsett</button>
+      </div>`;
+    document.body.append(dlg);
+    let result = false;
+    dlg.addEventListener('click', (e) => {
+      const b = e.target.closest('button');
+      if (b) { result = b.value === 'ok'; dlg.close(); }
+    });
+    dlg.addEventListener('close', () => { dlg.remove(); resolve(result); });
+    dlg.showModal();
   });
 }

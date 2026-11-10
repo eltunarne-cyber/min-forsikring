@@ -2,7 +2,7 @@
 // Cache-first for app-filer. Bytt CACHE-versjonen når appen endres, ellers
 // får brukerne ikke de nye filene.
 
-const CACHE = 'min-forsikring-v1.0.2';
+const CACHE = 'min-forsikring-v1.0.3';
 
 const APP_FILES = [
   './',
